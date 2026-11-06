@@ -1,7 +1,9 @@
 """Provider transport boundary, validation, backoff and privacy regressions."""
 
 import logging
+import math
 import socket
+import sys
 import time
 
 import pytest
@@ -112,7 +114,8 @@ async def test_429_extremes_are_bounded_and_shared(hass, provider, header):
     before = time.monotonic()
     with pytest.raises(RateLimited):
         await client.async_get_player("#P0Y")
-    assert before < gate.retry_until <= time.monotonic() + 86401
+    assert before < gate.retry_until <= sys.float_info.max
+    assert math.isfinite(gate.retry_until)
     replacement = ClashRoyaleClient(
         async_get_clientsession(hass),
         "synthetic-key",
@@ -134,7 +137,58 @@ async def test_429_extremes_are_bounded_and_shared(hass, provider, header):
     ],
 )
 def test_retry_date_or_fallback(header):
-    assert 1 <= retry_delay(header) <= 86400
+    assert 1 <= retry_delay(header) <= sys.float_info.max
+    assert math.isfinite(retry_delay(header))
+
+
+@pytest.mark.parametrize(
+    "header,minimum",
+    [
+        ("172800", 172800),
+        ("1e308", 1e308),
+        ("1e9999", float("1.7976931348623157e308")),
+        ("Wed, 01 Jan 9999 00:00:00 GMT", 1e11),
+    ],
+)
+async def test_long_retry_after_never_shortens_provider_deadline(
+    hass, provider, freezer, header, minimum
+):
+    import math
+
+    provider.set(
+        "/v1/players/#P0Y", 429, {"message": "PRIVATE-CANARY"}, {"Retry-After": header}
+    )
+    client = ClashRoyaleClient(async_get_clientsession(hass), "synthetic-key")
+    before = time.monotonic()
+    with pytest.raises(RateLimited):
+        await client.async_get_player("#P0Y")
+    assert math.isfinite(client.gate.retry_until)
+    assert client.gate.retry_until >= before + minimum
+    freezer.tick(86401)
+    with pytest.raises(RateLimited):
+        await client.async_get_player("#P0Y")
+    assert len(provider.requests) == 1
+
+
+async def test_retry_deadline_saturates_when_addition_overflows(
+    hass, provider, monkeypatch
+):
+    import sys
+    from types import SimpleNamespace
+
+    from custom_components.clash_royale_war import api
+
+    provider.set("/v1/players/#P0Y", 429, {}, {"Retry-After": str(sys.float_info.max)})
+    monkeypatch.setattr(
+        api, "time", SimpleNamespace(monotonic=lambda: sys.float_info.max / 2)
+    )
+    client = ClashRoyaleClient(async_get_clientsession(hass), "synthetic-key")
+    with pytest.raises(RateLimited):
+        await client.async_get_player("#P0Y")
+    assert client.gate.retry_until == sys.float_info.max
+    with pytest.raises(RateLimited):
+        await client.async_get_player("#P0Y")
+    assert len(provider.requests) == 1
 
 
 async def test_retired_client_never_sends(hass, provider):
@@ -143,6 +197,43 @@ async def test_retired_client_never_sends(hass, provider):
     with pytest.raises(Retired):
         await client.async_get_player("#P0Y")
     assert provider.requests == []
+
+
+@pytest.mark.parametrize("status", [401, 403])
+async def test_retire_during_auth_body_read(hass, provider, monkeypatch, status):
+    import asyncio
+
+    import aiohttp
+
+    provider.set(
+        "/v1/players/#P0Y",
+        status,
+        {"reason": "accessDenied.invalidIp", "message": "PRIVATE-CANARY"},
+    )
+    client = ClashRoyaleClient(async_get_clientsession(hass), "synthetic-key")
+    started, release = asyncio.Event(), asyncio.Event()
+    real_json = aiohttp.ClientResponse.json
+
+    async def blocked_json(response, *args, **kwargs):
+        started.set()
+        await release.wait()
+        return await real_json(response, *args, **kwargs)
+
+    monkeypatch.setattr(aiohttp.ClientResponse, "json", blocked_json)
+    task = asyncio.create_task(client.async_get_player("#P0Y"))
+    try:
+        await asyncio.wait_for(started.wait(), 2)
+        client.retired = True
+        release.set()
+        with pytest.raises(Retired, match="Runtime unloaded") as exc:
+            await task
+        assert exc.value.__suppress_context__
+        assert len(provider.requests) == 1
+    finally:
+        release.set()
+        if not task.done():
+            task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
 
 
 async def test_transport_privacy(hass, provider, monkeypatch, caplog):

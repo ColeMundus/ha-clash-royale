@@ -127,6 +127,107 @@ async def test_retire_discards_inflight_and_preserves_reserved_budget(
         await asyncio.gather(task, return_exceptions=True)
 
 
+@pytest.mark.parametrize(
+    "status,phase",
+    [
+        (401, "headers"),
+        (403, "headers"),
+        (429, "headers"),
+        (401, "body"),
+        (403, "body"),
+    ],
+)
+@pytest.mark.parametrize("replace", [False, True])
+async def test_native_unload_discards_delayed_error(
+    hass, provider, freezer, monkeypatch, caplog, status, phase, replace
+):
+    import time
+    from copy import deepcopy
+
+    from homeassistant.config_entries import ConfigEntryState
+    from homeassistant.helpers import entity_registry as er
+
+    entry = MockConfigEntry(
+        domain="clash_royale_war",
+        unique_id="#P0Y",
+        data={"api_key": "synthetic-key", "player_tag": "#P0Y"},
+        options={"scan_interval": 5, "custom": "preserved"},
+    )
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    runtime = entry.runtime_data
+    registry = er.async_get(hass)
+    original_data, original_options = dict(entry.data), dict(entry.options)
+    original_registry = dict(registry.entities)
+    started, release = asyncio.Event(), asyncio.Event()
+
+    async def block(request):
+        started.set()
+        await release.wait()
+
+    if phase == "headers":
+        provider.before_response = block
+    else:
+        import aiohttp
+
+        real_json = aiohttp.ClientResponse.json
+
+        async def blocked_json(response, *args, **kwargs):
+            if response.status in (401, 403):
+                started.set()
+                await release.wait()
+            return await real_json(response, *args, **kwargs)
+
+        monkeypatch.setattr(aiohttp.ClientResponse, "json", blocked_json)
+    provider.set(
+        "/v1/players/#P0Y",
+        status,
+        {"reason": "accessDenied.invalidIp", "message": "PRIVATE-CANARY"},
+        {"Retry-After": "600"},
+    )
+    freezer.tick(301)
+    task = asyncio.create_task(runtime.async_refresh())
+    try:
+        await asyncio.wait_for(started.wait(), 2)
+        assert await hass.config_entries.async_unload(entry.entry_id)
+        assert entry.state is ConfigEntryState.NOT_LOADED
+        assert runtime.retired
+        release.set()
+        await task
+        await hass.async_block_till_done()
+        assert hass.config_entries.flow.async_progress() == []
+        assert runtime.gate.snapshot is None
+        assert entry.data == original_data
+        assert entry.options == original_options
+        assert dict(registry.entities) == original_registry
+        if status == 429:
+            assert runtime.client.gate.retry_until == time.monotonic() + 600
+        if replace:
+            # A successor can refresh only after the retained request budget.
+            provider.before_response = None
+            provider.set("/v1/players/#P0Y", body={"tag": "#P0Y", "trophies": 123})
+            freezer.tick(601)
+            assert await hass.config_entries.async_setup(entry.entry_id)
+            await hass.async_block_till_done()
+            successor = entry.runtime_data
+            assert successor is not runtime
+            assert not successor.retired
+            successor_data = deepcopy(successor.data)
+            await runtime.async_refresh()
+            await hass.async_block_till_done()
+            assert entry.runtime_data is successor
+            assert successor.data == successor_data
+            assert hass.config_entries.flow.async_progress() == []
+        assert len(provider.requests) == (5 if replace else 4)
+        assert "PRIVATE-CANARY" not in caplog.text
+    finally:
+        release.set()
+        if not task.done():
+            task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+
+
 @pytest.mark.parametrize("minutes,deadline", [(10, 600), (1, 300)])
 async def test_interval_reload_never_shortens_reserved_deadline(
     hass, provider, freezer, minutes, deadline

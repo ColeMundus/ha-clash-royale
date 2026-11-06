@@ -131,6 +131,8 @@ class ClashRoyaleCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 self.gate.snapshot = snapshot
                 return snapshot
             except InvalidAuth:
+                if self.retired or self.client.retired:
+                    raise UpdateFailed("Runtime unloaded") from None
                 raise ConfigEntryAuthFailed(
                     "API key rejected; check key and IP allowlist"
                 ) from None

@@ -19,7 +19,7 @@ def test_readme_installation_and_minimal_setup():
     assert "Custom repositories" in readme
     assert "has not been submitted" in readme
     assert "https://developer.clashroyale.com/" in readme
-    assert "**API key**" in readme and "**Player tag**" in readme
+    assert "**API token**" in readme and "**Player tag**" in readme
     assert "Allowed IP addresses" in readme and "IP-bound" in readme
     assert "Only the API token and player tag are required" in readme
     assert "remaining-attacks estimate" in readme

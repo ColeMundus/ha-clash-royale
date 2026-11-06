@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Connect Clash Royale War Tracker",
-        "description": "1. Sign in to the [Clash Royale War Tracker developer portal]({developer_portal}) and create an API token.\n2. Add Home Assistant’s public internet IP address to the token’s allowed IP addresses. The token is bound to those IP addresses; update it if your public IP changes.\n3. Paste the token and your in-game player tag below.\n\nPolling defaults to 5 minutes and can be changed in Options. See [setup help]({help_url}).",
+        "description": "1. Sign in to the [Clash Royale developer portal]({developer_portal}) and create an API token.\n2. Add Home Assistant’s public internet IP address to the token’s allowed IP addresses. The token is bound to those IP addresses; update it if your public IP changes.\n3. Paste the token and your in-game player tag below.\n\nPolling defaults to 5 minutes and can be changed in Options. See [setup help]({help_url}).",
         "data": {
           "api_key": "API token",
           "player_tag": "Player tag"
@@ -11,7 +11,7 @@
       },
       "reauth_confirm": {
         "title": "Replace API token",
-        "description": "Create a replacement API token in the [Clash Royale War Tracker developer portal]({developer_portal}) and allow Home Assistant’s public internet IP address. Tokens are IP-bound. Enter the replacement below; your existing player tag and options are retained. See [setup help]({help_url}).",
+        "description": "Create a replacement API token in the [Clash Royale developer portal]({developer_portal}) and allow Home Assistant’s public internet IP address. Tokens are IP-bound. Enter the replacement below; your existing player tag and options are retained. See [setup help]({help_url}).",
         "data": {
           "api_key": "New API token"
         }
@@ -28,7 +28,8 @@
     },
     "abort": {
       "already_configured": "This player is already configured.",
-      "reauth_successful": "API token updated successfully."
+      "reauth_successful": "API token updated successfully.",
+      "reauth_aborted": "Reauthentication was canceled."
     }
   },
   "options": {

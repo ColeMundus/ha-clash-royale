@@ -73,6 +73,13 @@ class ClashRoyaleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Set up one entry for a canonical player tag."""
 
     VERSION = 1
+    _removed = False
+
+    @callback
+    def async_remove(self) -> None:
+        """Invalidate in-flight submissions even when their task is not cancelled."""
+        self._removed = True
+        super().async_remove()
 
     @staticmethod
     @callback
@@ -144,7 +151,9 @@ class ClashRoyaleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
             except ClashRoyaleError as err:
                 errors["base"] = error_key(err)
-            else:
+            if self._removed:
+                return self.async_abort(reason="reauth_aborted")
+            if not errors:
                 return self.async_update_reload_and_abort(
                     entry, data_updates={CONF_API_KEY: user_input[CONF_API_KEY]}
                 )

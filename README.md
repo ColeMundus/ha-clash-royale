@@ -17,20 +17,22 @@ Requires **Home Assistant Core 2026.11.0 or newer**.
 2. Find **Clash Royale War Tracker**, choose **Install**, and restart Home Assistant when prompted. No pre-release setting is needed.
 3. Open **Settings → Devices & services → Add integration → Clash Royale War Tracker**.
 
-On older Home Assistant versions using HACS, add the URL under **Custom repositories** with category **Integration**.
+For HACS installations, add the URL under **Custom repositories** with category **Integration**.
 
 This is a **custom HACS repository**; it has not been submitted to the default catalog.
 
-**Manual install:** Copy `custom_components/clash_royale_war` from version **0.1.0** into your Home Assistant configuration directory's `custom_components` folder, then restart.
+**Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.0/clash_royale_war-0.1.0.zip), extract it into your Home Assistant configuration directory, and restart.
 
 ## Create an API key
 
 1. Sign in at the [Clash Royale developer portal](https://developer.clashroyale.com/).
 2. Open **My Account → Create New Key** and enter a name and description.
 3. Under **Allowed IP addresses**, enter the public IP address used by Home Assistant's outbound requests. Developer keys are IP-bound; update the key if that address changes.
-4. Create the key, then paste its **Token** into the integration's **API key** field and enter your in-game **Player tag**.
+4. Create the key, then paste its **Token** into the integration's **API token** field and enter your in-game **Player tag**.
 
-Only the API token and player tag are required. Add another integration entry to monitor another player.
+Only the API token and player tag are required. Add another integration entry to monitor another player. Polling defaults to five minutes and is adjustable from 1–60 minutes through **Configure**.
+
+![Clash Royale War Tracker setup in Home Assistant](docs/images/setup.png)
 
 ## Sensors
 

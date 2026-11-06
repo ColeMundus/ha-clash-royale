@@ -366,6 +366,79 @@ async def test_abort_inflight_reauth_preserves_entry(hass, provider):
     assert entry.unique_id == "#P0Y"
 
 
+@pytest.mark.parametrize("status", [200, 401, 429])
+async def test_abort_inflight_reauth_without_cancelling_submission(
+    hass, provider, status
+):
+    import asyncio
+    from copy import deepcopy
+
+    from homeassistant.helpers import entity_registry as er
+
+    entry = entry_for(hass, options={"scan_interval": 10, "custom": "preserved"})
+    hass.config_entries.async_update_entry(entry, data={**entry.data, "legacy": "kept"})
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    runtime = entry.runtime_data
+    registry = er.async_get(hass)
+    entity = er.async_entries_for_config_entry(registry, entry.entry_id)[0]
+    registry.async_update_entity(
+        entity.entity_id, new_entity_id="sensor.custom_player", name="Custom player"
+    )
+    await hass.async_block_till_done()
+    original_data, original_options = (
+        deepcopy(dict(entry.data)),
+        deepcopy(dict(entry.options)),
+    )
+    original_registry = dict(registry.entities)
+    original_states = {
+        state.entity_id: state.as_dict() for state in hass.states.async_all("sensor")
+    }
+    started, release = asyncio.Event(), asyncio.Event()
+
+    async def block(request):
+        started.set()
+        await release.wait()
+
+    provider.before_response = block
+    if status != 200:
+        provider.set("/v1/players/#P0Y", status, {"message": "PRIVATE-CANARY"})
+    flow = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_REAUTH, "entry_id": entry.entry_id},
+        data=entry.data,
+    )
+    task = asyncio.create_task(
+        hass.config_entries.flow.async_configure(
+            flow["flow_id"], {"api_key": "replacement-synthetic-key"}
+        )
+    )
+    try:
+        await asyncio.wait_for(started.wait(), 2)
+        hass.config_entries.flow.async_abort(flow["flow_id"])
+        assert not task.cancelled()
+        release.set()
+        result = await task
+        await hass.async_block_till_done()
+        assert entry.data == original_data
+        assert entry.options == original_options
+        assert entry.runtime_data is runtime
+        assert not runtime.retired
+        assert dict(registry.entities) == original_registry
+        assert {
+            state.entity_id: state.as_dict()
+            for state in hass.states.async_all("sensor")
+        } == original_states
+        assert result["type"] is FlowResultType.ABORT
+        assert result["reason"] != "reauth_successful"
+        assert hass.config_entries.flow.async_progress() == []
+    finally:
+        release.set()
+        if not task.done():
+            task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+
+
 @pytest.mark.parametrize(
     "status, body",
     [

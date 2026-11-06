@@ -155,6 +155,50 @@ async def test_optional_river_failure_keeps_player_clan(hass, provider, status):
     assert len(provider.requests) == 3
 
 
+@pytest.mark.parametrize(
+    "header", ["172800", "1e308", "1e9999", "1.7976931348623157e308"]
+)
+async def test_optional_long_429_native_timer_and_reload(
+    hass, provider, freezer, header
+):
+    import math
+    import time
+
+    provider.set(
+        "/v1/clans/#Q0G/currentriverrace",
+        429,
+        {"message": "PRIVATE-CANARY"},
+        {"Retry-After": header},
+    )
+    entry = await setup(hass)
+    runtime = entry.runtime_data
+    deadline = runtime.client.gate.retry_until
+    assert math.isfinite(deadline)
+    assert deadline >= time.monotonic() + 172800
+    assert runtime.last_update_success
+    assert hass.states.get(PREFIX + "trophies").state == "7500"
+    assert math.isfinite(runtime._unsub_refresh.__self__.when())
+    assert runtime._unsub_refresh.__self__.when() >= deadline
+    freezer.tick(86401)
+    async_fire_time_changed(hass, dt_util.utcnow())
+    await hass.async_block_till_done(wait_background_tasks=True)
+    await runtime.async_refresh()
+    assert await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert entry.runtime_data.client.gate.retry_until == deadline
+    assert entry.runtime_data.last_update_success
+    assert hass.states.get(PREFIX + "trophies").state == "7500"
+    assert len(provider.requests) == 3
+    if header == "172800":
+        # Only one normal scheduled refresh, after the provider's full deadline.
+        provider.set("/v1/clans/#Q0G/currentriverrace", body={"clan": {"tag": "#Q0G"}})
+        freezer.tick(86401)
+        async_fire_time_changed(hass, dt_util.utcnow())
+        await hass.async_block_till_done(wait_background_tasks=True)
+        assert len(provider.requests) == 6
+    assert await hass.config_entries.async_unload(entry.entry_id)
+
+
 async def test_reload_and_unload_preserve_custom_entity(hass, provider):
     entry = await setup(hass)
     old = entry.runtime_data

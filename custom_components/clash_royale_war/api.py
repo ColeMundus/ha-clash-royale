@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import math
+import sys
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -66,7 +67,9 @@ def retry_delay(value: str | None) -> float:
             return 60
     if math.isnan(delay):
         return 60
-    return min(86400.0, max(1.0, delay))
+    # Do not shorten a valid provider cooldown to an arbitrary local limit.
+    # Keep even overflowed numeric headers finite for the monotonic scheduler.
+    return min(sys.float_info.max, max(1.0, delay))
 
 
 class ClashRoyaleClient:
@@ -97,16 +100,22 @@ class ClashRoyaleClient:
                     allow_redirects=False,
                 ) as response:
                     if response.status == 429:
-                        self.gate.retry_until = time.monotonic() + retry_delay(
-                            response.headers.get("Retry-After")
+                        self.gate.retry_until = min(
+                            sys.float_info.max,
+                            time.monotonic()
+                            + retry_delay(response.headers.get("Retry-After")),
                         )
                         raise RateLimited("Provider cooldown active")
 
+                    if self.retired:
+                        raise Retired("Runtime unloaded")
                     if response.status in (401, 403):
                         try:
                             reason = (await response.json()).get("reason")
                         except ValueError, aiohttp.ClientError, AttributeError:
                             reason = None
+                        if self.retired:
+                            raise Retired("Runtime unloaded")
                         if reason == "accessDenied.invalidIp":
                             raise IPNotAllowed("Public IP is not allowed")
                         raise InvalidAuth("API key rejected")
