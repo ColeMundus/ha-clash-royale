@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Clash Royale War Tracker",
+        "description": "1. Sign in to the [Clash Royale War Tracker developer portal]({developer_portal}) and create an API token.\n2. Add Home Assistant’s public internet IP address to the token’s allowed IP addresses. The token is bound to those IP addresses; update it if your public IP changes.\n3. Paste the token and your in-game player tag below.\n\nPolling defaults to 5 minutes and can be changed in Options. See [setup help]({help_url}).",
+        "data": {
+          "api_key": "API token",
+          "player_tag": "Player tag"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Replace API token",
+        "description": "Create a replacement API token in the [Clash Royale War Tracker developer portal]({developer_portal}) and allow Home Assistant’s public internet IP address. Tokens are IP-bound. Enter the replacement below; your existing player tag and options are retained. See [setup help]({help_url}).",
+        "data": {
+          "api_key": "New API token"
+        }
+      }
+    },
+    "error": {
+      "invalid_tag": "Enter a valid player tag using only 0289PYLQGRJCUV, with an optional # prefix.",
+      "invalid_interval": "Choose a whole number of minutes from 1 to 60.",
+      "invalid_auth": "The API key was rejected. Check the key and try again.",
+      "ip_not_allowed": "This key does not allow Home Assistant’s public IP address. Update its IP allowlist in the developer portal.",
+      "player_not_found": "No player was found for this tag.",
+      "rate_limited": "The provider has requested a cooldown. Wait before trying again.",
+      "cannot_connect": "Unable to connect to Clash Royale War Tracker. Try again later."
+    },
+    "abort": {
+      "already_configured": "This player is already configured.",
+      "reauth_successful": "API token updated successfully."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Polling options",
+        "description": "Choose a whole number of minutes from 1 to 60. Provider cooldowns still apply to manual refreshes and reloads.",
+        "data": {
+          "scan_interval": "Polling interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "invalid_interval": "Choose a whole number of minutes from 1 to 60."
+    }
+  }
+}

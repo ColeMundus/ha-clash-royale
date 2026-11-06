@@ -1,0 +1,73 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.12.19"
+          python-version: "3.14.7"
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv pip check
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+      - run: uv run --locked pytest --cov=custom_components/clash_royale_war --cov-report=term-missing --cov-fail-under=85
+      - run: uv run --locked python scripts/build_artifact.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: clash-royale-integration
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+  hassfest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate integration metadata
+        run: >-
+          docker run --rm -v "$GITHUB_WORKSPACE:/github/workspace"
+          ghcr.io/home-assistant/hassfest@sha256:f9ac52cfe0f7b8770334f191e6713aa9f10f0906a989bd38d75a4933534144c7
+  hacs:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: hacs/action@d556e736723344f83838d08488c983a15381059a # 22.5.0
+        with:
+          category: integration
+  checks:
+    if: always()
+    needs: [test, hassfest, hacs]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Required checks
+        env:
+          TEST: ${{ needs.test.result }}
+          HASSFEST: ${{ needs.hassfest.result }}
+          HACS: ${{ needs.hacs.result }}
+          PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          test "$TEST" = success
+          test "$HASSFEST" = success
+          test "$HACS" = success || { test "$PRIVATE" = true && test "$HACS" = skipped; }

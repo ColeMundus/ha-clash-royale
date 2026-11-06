@@ -1,0 +1,15 @@
+{
+  "domain": "clash_royale_war",
+  "name": "Clash Royale War Tracker",
+  "categories": ["media_entertainment.gaming"],
+  "codeowners": [
+    "@ColeMundus"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/ColeMundus/ha-clash-royale",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/ColeMundus/ha-clash-royale/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
