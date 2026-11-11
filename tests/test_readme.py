@@ -1,6 +1,7 @@
 """Keep reader-facing docs accurate without real accounts or network access."""
 
 import ast
+import json
 import re
 from pathlib import Path
 
@@ -15,7 +16,8 @@ def test_readme_installation_and_minimal_setup():
     assert readme.index("## Installation") < readme.index("## Create an API key")
     assert "https://github.com/ColeMundus/ha-clash-royale" in readme
     assert "Home Assistant Core 2026.11.0" in readme
-    assert "0.1.0" in readme
+    version = json.loads((COMPONENT / "manifest.json").read_text())["version"]
+    assert f"/v{version}/clash_royale_war-{version}.zip" in readme
     assert "Custom repositories" in readme
     assert "has not been submitted" in readme
     assert "https://developer.clashroyale.com/" in readme
@@ -28,6 +30,9 @@ def test_readme_installation_and_minimal_setup():
     assert "player's reported medals" in readme
     assert "Colosseum score" in readme
     assert "No race rank is exposed" in readme
+    assert "artwork belongs" not in readme
+    assert "official artwork" not in readme.casefold()
+    assert "not endorsed" not in readme.casefold()
     for stale in ("Clash of Clans", "clash_of_clans", "ha-clash-of-clans"):
         assert stale not in readme
 
@@ -69,7 +74,7 @@ def test_sensor_table_matches_implemented_sensor_names():
     assert documented == {name.casefold() for name in names}
 
 
-def test_official_brand_asset_and_attribution():
+def test_brand_asset_and_removed_notices():
     readme = (ROOT / "README.md").read_text()
     assert (
         '<img src="https://raw.githubusercontent.com/ColeMundus/ha-clash-royale/'
@@ -81,19 +86,8 @@ def test_official_brand_asset_and_attribution():
         assert image.size == (512, 512)
         assert not image.info
         image.verify()
-    notice = (ROOT / "NOTICE.md").read_text()
-    assert notice == (COMPONENT / "NOTICE.md").read_text()
-    for attribution in (
-        "Supercell Oy",
-        "https://supercell.com/en/games/clashroyale/",
-        "https://apps.apple.com/us/app/clash-royale/id1053012308",
-        "https://itunes.apple.com/lookup?id=1053012308",
-        "https://supercell.com/en/fan-content-policy/",
-        "not the repository's MIT license",
-        "This material is unofficial and is not endorsed by Supercell",
-    ):
-        assert attribution in notice
-    assert "is1-ssl.mzstatic.com" in notice
+    assert not (ROOT / "NOTICE.md").exists()
+    assert not (COMPONENT / "NOTICE.md").exists()
 
 
 def test_native_setup_screenshots_are_optional_and_metadata_free():

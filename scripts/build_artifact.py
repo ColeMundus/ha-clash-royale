@@ -38,7 +38,7 @@ def validate_member(name, data):
     if path.is_absolute() or ".." in path.parts or "\\" in name:
         raise ValueError("Unsafe archive path")
     local = name.removeprefix(PREFIX)
-    if not name.startswith(PREFIX) or local not in REQUIRED | {"LICENSE", "NOTICE.md"}:
+    if not name.startswith(PREFIX) or local not in REQUIRED | {"LICENSE"}:
         raise ValueError(f"Unapproved archive member: {name}")
     if len(data) > MAX_FILE:
         raise ValueError("Artifact member exceeds size limit")
@@ -74,7 +74,7 @@ def build(root: Path, output: Path):
     missing = REQUIRED - {name.removeprefix(PREFIX) for name in files}
     if missing:
         raise ValueError(f"Missing required runtime files: {sorted(missing)}")
-    for notice in ("LICENSE", "NOTICE.md"):
+    for notice in ("LICENSE",):
         path = root / notice
         if path.is_symlink():
             raise ValueError("Symlink notice")

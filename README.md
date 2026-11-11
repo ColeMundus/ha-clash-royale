@@ -21,7 +21,7 @@ For HACS installations, add the URL under **Custom repositories** with category 
 
 This is a **custom HACS repository**; it has not been submitted to the default catalog.
 
-**Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.0/clash_royale_war-0.1.0.zip), extract it into your Home Assistant configuration directory, and restart.
+**Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.1/clash_royale_war-0.1.1.zip), extract it into your Home Assistant configuration directory, and restart.
 
 ## Create an API key
 
@@ -49,5 +49,3 @@ Player race fame is the player's reported medals; clan River Race fame is clan p
 
 - Data is polled, not live. Players without a clan and missing optional River Race data leave the corresponding sensors unavailable, not zero.
 - The API does not expose chest queues, upgrade timers or resource balances. Decks used today is a reported count, not a remaining-attacks estimate or a reset countdown.
-
-Clash Royale artwork belongs to Supercell; see [NOTICE.md](NOTICE.md). This material is unofficial and is not endorsed by Supercell. See Supercell's [Fan Content Policy](https://supercell.com/en/fan-content-policy/).

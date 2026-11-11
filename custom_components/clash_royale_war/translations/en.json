@@ -7,6 +7,9 @@
         "data": {
           "api_key": "API token",
           "player_tag": "Player tag"
+        },
+        "data_description": {
+          "player_tag": "Found below your name in your player profile, e.g. #P0Y28Q (# optional)."
         }
       },
       "reauth_confirm": {
