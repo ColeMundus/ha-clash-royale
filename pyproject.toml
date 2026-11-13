@@ -11,7 +11,7 @@ dev = [
   "pytest-homeassistant==2026.11.0",
   "pytest-cov==7.1.0",
   "pillow==13.0.0",
-  "ruff==0.17.3",
+  "ruff==0.17.4",
 ]
 
 [tool.uv]
