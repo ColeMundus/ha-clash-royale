@@ -43,7 +43,7 @@ def test_build_reproducible_complete_and_importable(package_source, tmp_path):
     version = json.loads((package_source / PREFIX / "manifest.json").read_text())[
         "version"
     ]
-    assert archive.name == f"clash_royale_war-{version}.zip"
+    assert archive.name == f"clash_royale-{version}.zip"
     assert archive.with_suffix(".zip.sha256").read_text() == (
         f"{digest}  {archive.name}\n"
     )
@@ -58,7 +58,7 @@ def test_build_reproducible_complete_and_importable(package_source, tmp_path):
         [
             sys.executable,
             "-c",
-            "import custom_components.clash_royale_war.sensor as sensor; import custom_components.clash_royale_war.config_flow; assert sensor.DOMAIN == 'clash_royale_war'; print(sensor.__file__)",
+            "import custom_components.clash_royale.sensor as sensor; import custom_components.clash_royale.config_flow; assert sensor.DOMAIN == 'clash_royale'; print(sensor.__file__)",
         ],
         cwd=tmp_path / "installed",
         env=env,
@@ -175,8 +175,8 @@ def test_metadata_agrees_with_distribution():
     hacs = json.loads((ROOT / "hacs.json").read_text())
     assert project["name"] == "ha-clash-royale"
     assert project["version"] == manifest["version"]
-    assert manifest["domain"] == "clash_royale_war"
-    assert manifest["name"] == hacs["name"] == "Clash Royale War Tracker"
+    assert manifest["domain"] == "clash_royale"
+    assert manifest["name"] == hacs["name"] == "Clash Royale"
     assert manifest["documentation"] == "https://github.com/ColeMundus/ha-clash-royale"
     assert manifest["issue_tracker"] == manifest["documentation"] + "/issues"
     assert hacs["homeassistant"] == "2026.11.0"
@@ -186,7 +186,7 @@ def test_metadata_agrees_with_distribution():
 
 
 def test_player_tag_field_explains_format_and_location():
-    from custom_components.clash_royale_war.const import normalize_tag
+    from custom_components.clash_royale.const import normalize_tag
 
     strings = json.loads((ROOT / PREFIX / "strings.json").read_text())
     help_text = strings["config"]["step"]["user"]["data_description"]["player_tag"]

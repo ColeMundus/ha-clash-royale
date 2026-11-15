@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Connect Clash Royale War Tracker",
+        "title": "Connect Clash Royale",
         "description": "1. Sign in to the [Clash Royale developer portal]({developer_portal}) and create an API token.\n2. Add Home Assistant’s public internet IP address to the token’s allowed IP addresses. The token is bound to those IP addresses; update it if your public IP changes.\n3. Paste the token and your in-game player tag below.\n\nPolling defaults to 5 minutes and can be changed in Options. See [setup help]({help_url}).",
         "data": {
           "api_key": "API token",
@@ -27,7 +27,7 @@
       "ip_not_allowed": "This key does not allow Home Assistant’s public IP address. Update its IP allowlist in the developer portal.",
       "player_not_found": "No player was found for this tag.",
       "rate_limited": "The provider has requested a cooldown. Wait before trying again.",
-      "cannot_connect": "Unable to connect to Clash Royale War Tracker. Try again later."
+      "cannot_connect": "Unable to connect to Clash Royale. Try again later."
     },
     "abort": {
       "already_configured": "This player is already configured.",

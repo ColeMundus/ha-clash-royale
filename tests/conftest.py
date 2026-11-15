@@ -106,7 +106,7 @@ async def provider(monkeypatch, player, clan, war):
     """Use real aiohttp HTTP parsing, sessions, errors and response teardown."""
     pytest_socket.enable_socket()
     pytest_socket.socket_allow_hosts(["127.0.0.1", "::1"], allow_unix_socket=True)
-    from custom_components.clash_royale_war import api
+    from custom_components.clash_royale import api
 
     class Provider:
         responses = {

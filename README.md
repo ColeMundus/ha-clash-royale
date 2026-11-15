@@ -1,6 +1,6 @@
-<img src="https://raw.githubusercontent.com/ColeMundus/ha-clash-royale/main/custom_components/clash_royale_war/brand/icon.png" alt="Clash Royale War Tracker" width="96">
+<img src="https://raw.githubusercontent.com/ColeMundus/ha-clash-royale/main/custom_components/clash_royale/brand/icon.png" alt="Clash Royale" width="96">
 
-# Clash Royale War Tracker for Home Assistant
+# Clash Royale for Home Assistant
 
 [![CI: workflow](docs/badges/ci.svg)](https://github.com/ColeMundus/ha-clash-royale/actions/workflows/ci.yml)
 [![HA tested: 2026.11.0](docs/badges/compatibility.svg)](https://github.com/ColeMundus/ha-clash-royale/actions/workflows/ci.yml)
@@ -13,12 +13,12 @@ Player, current-clan and River Race sensors using Supercell's official API. Ente
 
 Requires **Home Assistant Core 2026.11.0 or newer**.
 
-1. Search for **Clash Royale War Tracker** in HACS or **Settings → Marketplace**.
+1. Search for **Clash Royale** in HACS or **Settings → Marketplace**.
 2. If it is not listed yet, add `https://github.com/ColeMundus/ha-clash-royale` as a custom repository with category **Integration**. In the Marketplace, choose **Add from link** and connect GitHub if prompted.
 3. Choose **Install**, and restart Home Assistant when prompted. No pre-release setting is needed.
-4. Open **Settings → Devices & services → Add integration → Clash Royale War Tracker**.
+4. Open **Settings → Devices & services → Add integration → Clash Royale**.
 
-**Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.2/clash_royale_war-0.1.2.zip), extract it into your Home Assistant configuration directory, and restart.
+**Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.2/clash_royale-0.1.2.zip), extract it into your Home Assistant configuration directory, and restart.
 
 ## Create an API key
 
@@ -29,7 +29,7 @@ Requires **Home Assistant Core 2026.11.0 or newer**.
 
 Only the API token and player tag are required. Add another integration entry to monitor another player. Polling defaults to five minutes and is adjustable from 1–60 minutes through **Configure**.
 
-![Clash Royale War Tracker setup in Home Assistant](docs/images/setup.png)
+![Clash Royale setup in Home Assistant](docs/images/setup.png)
 
 ## Sensors
 

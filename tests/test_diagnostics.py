@@ -5,11 +5,11 @@ import json
 from homeassistant.components.diagnostics import REDACTED
 from pytest_homeassistant.common import MockConfigEntry
 
-from custom_components.clash_royale_war.diagnostics import (
+from custom_components.clash_royale.diagnostics import (
     async_get_config_entry_diagnostics,
 )
 
-DOMAIN = "clash_royale_war"
+DOMAIN = "clash_royale"
 TOKEN = "synthetic-key"
 
 
@@ -17,7 +17,7 @@ async def test_diagnostics_redact_token_and_keep_public_snapshot(hass, provider)
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id="#P0Y",
-        title="Clash Royale War Tracker Synthetic Player",
+        title="Clash Royale Synthetic Player",
         data={"api_key": TOKEN, "player_tag": "#P0Y"},
         options={"scan_interval": 5},
     )

@@ -9,11 +9,11 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant.common import MockConfigEntry, async_fire_time_changed
 
-from custom_components.clash_royale_war.sensor import SENSORS
+from custom_components.clash_royale.sensor import SENSORS
 
-DOMAIN = "clash_royale_war"
+DOMAIN = "clash_royale"
 INPUT = {"api_key": "synthetic-key", "player_tag": "#P0Y", "scan_interval": 5}
-PREFIX = "sensor.clash_royale_war_tracker_synthetic_player_"
+PREFIX = "sensor.clash_royale_synthetic_player_"
 
 
 async def setup(hass, options=None):
@@ -70,14 +70,14 @@ async def test_native_states_icons_and_registry(hass, provider, war):
         assert states[PREFIX + description.key].attributes["icon"] == description.icon
     assert (
         states[PREFIX + "trophies"].attributes["friendly_name"]
-        == "Clash Royale War Tracker Synthetic Player Trophies"
+        == "Clash Royale Synthetic Player Trophies"
     )
     entities = er.async_entries_for_config_entry(er.async_get(hass), entry.entry_id)
     assert {e.unique_id for e in entities} == {f"#P0Y_{key}" for key in expected}
     device = dr.async_get(hass).async_get_device_by_identifier(
         (DOMAIN, "#P0Y"), entry.entry_id
     )
-    assert device.name == "Clash Royale War Tracker Synthetic Player"
+    assert device.name == "Clash Royale Synthetic Player"
     assert len(provider.requests) == 3
 
 

@@ -9,7 +9,7 @@ from pathlib import Path, PurePosixPath
 
 from PIL import Image
 
-DOMAIN = "clash_royale_war"
+DOMAIN = "clash_royale"
 PREFIX = f"custom_components/{DOMAIN}/"
 REQUIRED = {
     "__init__.py",
@@ -95,7 +95,7 @@ def build(root: Path, output: Path):
     if sum(map(len, files.values())) > MAX_TOTAL:
         raise ValueError("Artifact exceeds total size limit")
     output.mkdir(parents=True, exist_ok=True)
-    archive = output / f"clash_royale_war-{version}.zip"
+    archive = output / f"clash_royale-{version}.zip"
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
         for name, data in sorted(files.items()):
             info = zipfile.ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0))

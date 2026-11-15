@@ -1,6 +1,6 @@
 {
-  "domain": "clash_royale_war",
-  "name": "Clash Royale War Tracker",
+  "domain": "clash_royale",
+  "name": "Clash Royale",
   "categories": ["media_entertainment.gaming"],
   "codeowners": [
     "@ColeMundus"

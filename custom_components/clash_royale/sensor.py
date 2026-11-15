@@ -202,12 +202,9 @@ class ClashRoyaleSensor(CoordinatorEntity[ClashRoyaleCoordinator], SensorEntity)
         player = (self.coordinator.data or {}).get("player") or {}
         return DeviceInfo(
             identifiers={(DOMAIN, self.coordinator.player_tag)},
-            name=(
-                "Clash Royale War Tracker "
-                f"{player.get('name', self.coordinator.player_tag)}"
-            ),
+            name=f"Clash Royale {player.get('name', self.coordinator.player_tag)}",
             manufacturer="Supercell",
-            model="Clash Royale War Tracker player",
+            model="Clash Royale player",
         )
 
     @property

@@ -1,4 +1,4 @@
-"""Clash Royale War Tracker cloud polling integration."""
+"""Clash Royale cloud polling integration."""
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY

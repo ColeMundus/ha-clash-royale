@@ -1,8 +1,8 @@
-"""Constants and strict input validation for Clash Royale War Tracker."""
+"""Constants and strict input validation for Clash Royale."""
 
 import re
 
-DOMAIN = "clash_royale_war"
+DOMAIN = "clash_royale"
 CONF_PLAYER_TAG = "player_tag"
 DEFAULT_SCAN_INTERVAL = 5
 API_BASE = "https://api.clashroyale.com/v1"

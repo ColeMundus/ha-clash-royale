@@ -114,7 +114,7 @@ class ClashRoyaleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     errors["base"] = error_key(err)
                 else:
                     return self.async_create_entry(
-                        title=f"Clash Royale War Tracker {player.get('name', tag)}",
+                        title=f"Clash Royale {player.get('name', tag)}",
                         data={
                             CONF_API_KEY: user_input[CONF_API_KEY],
                             CONF_PLAYER_TAG: tag,

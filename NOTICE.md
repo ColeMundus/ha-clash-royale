@@ -3,7 +3,7 @@
 Clash Royale and its artwork are owned by Supercell Oy. The MIT license
 covers this integration's original code, not Supercell's trademarks or artwork.
 
-The bundled `custom_components/clash_royale_war/brand/icon.png` is the official
+The bundled `custom_components/clash_royale/brand/icon.png` is the official
 Clash Royale app artwork from Supercell's App Store listing (app ID 1053012308,
 publisher Supercell, seller Supercell Oy). Supercell's own game page links to
 this app listing. The supplied 512 × 512 JPEG was decoded and saved as PNG
