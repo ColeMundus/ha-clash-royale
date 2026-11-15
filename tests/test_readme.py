@@ -18,8 +18,20 @@ def test_readme_installation_and_minimal_setup():
     assert "Home Assistant Core 2026.11.0" in readme
     version = json.loads((COMPONENT / "manifest.json").read_text())["version"]
     assert f"/v{version}/clash_royale_war-{version}.zip" in readme
-    assert "Custom repositories" in readme
-    assert "has not been submitted" in readme
+    install = readme.split("## Installation", 1)[1].split("## ", 1)[0]
+    assert "Search for **Clash Royale War Tracker**" in install
+    assert "not listed yet" in install
+    assert "custom repository" in install
+    assert "category **Integration**" in install
+    for stale in (
+        "has not been submitted",
+        "custom HACS repository",
+        "Custom repositories",
+        "pending inclusion",
+        "default catalog",
+        "while default-catalog",
+    ):
+        assert stale not in readme
     assert "https://developer.clashroyale.com/" in readme
     assert "**API token**" in readme and "**Player tag**" in readme
     assert "Allowed IP addresses" in readme and "IP-bound" in readme

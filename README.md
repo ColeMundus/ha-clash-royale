@@ -13,13 +13,10 @@ Player, current-clan and River Race sensors using Supercell's official API. Ente
 
 Requires **Home Assistant Core 2026.11.0 or newer**.
 
-1. Open **Settings → Marketplace → Add from link** and enter `https://github.com/ColeMundus/ha-clash-royale`. Connect GitHub if prompted.
-2. Find **Clash Royale War Tracker**, choose **Install**, and restart Home Assistant when prompted. No pre-release setting is needed.
-3. Open **Settings → Devices & services → Add integration → Clash Royale War Tracker**.
-
-For HACS installations, add the URL under **Custom repositories** with category **Integration**.
-
-This is a **custom HACS repository**; it has not been submitted to the default catalog.
+1. Search for **Clash Royale War Tracker** in HACS or **Settings → Marketplace**.
+2. If it is not listed yet, add `https://github.com/ColeMundus/ha-clash-royale` as a custom repository with category **Integration**. In the Marketplace, choose **Add from link** and connect GitHub if prompted.
+3. Choose **Install**, and restart Home Assistant when prompted. No pre-release setting is needed.
+4. Open **Settings → Devices & services → Add integration → Clash Royale War Tracker**.
 
 **Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.2/clash_royale_war-0.1.2.zip), extract it into your Home Assistant configuration directory, and restart.
 
