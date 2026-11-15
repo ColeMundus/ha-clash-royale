@@ -16,7 +16,7 @@ from scripts.build_artifact import MAX_FILE, PREFIX, REQUIRED, build, validate_m
 ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.mark.parametrize("filename", ["LICENSE"])
+@pytest.mark.parametrize("filename", ["LICENSE", "NOTICE.md"])
 def test_source_download_includes_notices(filename):
     """HACS downloads the component subtree, not repository-root notices."""
     assert (ROOT / PREFIX / filename).read_bytes() == (ROOT / filename).read_bytes()
@@ -30,7 +30,7 @@ def package_source(tmp_path):
         root / "custom_components",
         ignore=shutil.ignore_patterns("__pycache__"),
     )
-    for filename in ["LICENSE"]:
+    for filename in ["LICENSE", "NOTICE.md"]:
         shutil.copyfile(ROOT / filename, root / filename)
     return root
 
@@ -47,10 +47,10 @@ def test_build_reproducible_complete_and_importable(package_source, tmp_path):
     assert archive.with_suffix(".zip.sha256").read_text() == (
         f"{digest}  {archive.name}\n"
     )
-    assert count == len(REQUIRED) + 1
+    assert count == len(REQUIRED) + 2
     with zipfile.ZipFile(archive) as bundle:
         assert set(bundle.namelist()) == {
-            PREFIX + name for name in REQUIRED | {"LICENSE"}
+            PREFIX + name for name in REQUIRED | {"LICENSE", "NOTICE.md"}
         }
         bundle.extractall(tmp_path / "installed")
     env = {k: v for k, v in os.environ.items() if k not in {"PYTHONPATH", "PYTHONHOME"}}
@@ -95,7 +95,7 @@ def test_size_limit():
 def test_credentials_rejected():
     credential = b"eyJ" + b"x" * 30 + b"." + b"y" * 30 + b"." + b"z" * 30
     with pytest.raises(ValueError, match="credential"):
-        validate_member(PREFIX + "LICENSE", credential)
+        validate_member(PREFIX + "NOTICE.md", credential)
 
 
 @pytest.mark.parametrize(
@@ -107,7 +107,7 @@ def test_missing_runtime_file_rejected(package_source, tmp_path, filename):
         build(package_source, tmp_path / "dist")
 
 
-@pytest.mark.parametrize("filename", ["LICENSE"])
+@pytest.mark.parametrize("filename", ["LICENSE", "NOTICE.md"])
 def test_missing_notice_rejected(package_source, tmp_path, filename):
     (package_source / filename).unlink()
     with pytest.raises(FileNotFoundError):
@@ -134,7 +134,7 @@ def test_translation_matches_source():
     )
 
 
-@pytest.mark.parametrize("filename", ["LICENSE"])
+@pytest.mark.parametrize("filename", ["LICENSE", "NOTICE.md"])
 @pytest.mark.parametrize("missing", [False, True])
 def test_component_notices_required_and_matching(
     package_source, tmp_path, filename, missing
