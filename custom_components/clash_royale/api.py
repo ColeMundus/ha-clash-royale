@@ -1,4 +1,4 @@
-"""Small, fixed-origin, read-only Clash Royale War Tracker API client."""
+"""Small, fixed-origin, read-only Clash Royale API client."""
 
 import asyncio
 import hashlib

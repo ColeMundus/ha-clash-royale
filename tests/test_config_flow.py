@@ -5,7 +5,7 @@ from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResultType, InvalidData
 from pytest_homeassistant.common import MockConfigEntry
 
-DOMAIN = "clash_royale_war"
+DOMAIN = "clash_royale"
 INPUT = {"api_key": "synthetic-key", "player_tag": "#P0Y"}
 
 
@@ -305,7 +305,7 @@ async def test_real_setup_unload_retires_runtime(hass, provider):
     states = [
         state
         for state in hass.states.async_all()
-        if state.entity_id.startswith("sensor.clash_royale_war")
+        if state.entity_id.startswith("sensor.clash_royale")
     ]
     assert states
     assert all(state.state == "unavailable" for state in states)
@@ -494,7 +494,7 @@ async def test_platform_unload_failure_restores_runtime(
 ):
     from unittest.mock import AsyncMock
 
-    from custom_components.clash_royale_war import async_unload_entry
+    from custom_components.clash_royale import async_unload_entry
 
     entry = entry_for(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)

@@ -9,7 +9,7 @@ from pathlib import Path, PurePosixPath
 
 from PIL import Image
 
-DOMAIN = "clash_royale_war"
+DOMAIN = "clash_royale"
 PREFIX = f"custom_components/{DOMAIN}/"
 REQUIRED = {
     "__init__.py",
@@ -22,6 +22,7 @@ REQUIRED = {
     "strings.json",
     "translations/en.json",
     "brand/icon.png",
+    "diagnostics.py",
 }
 MAX_FILE = 2 * 1024 * 1024
 MAX_TOTAL = 5 * 1024 * 1024
@@ -38,7 +39,7 @@ def validate_member(name, data):
     if path.is_absolute() or ".." in path.parts or "\\" in name:
         raise ValueError("Unsafe archive path")
     local = name.removeprefix(PREFIX)
-    if not name.startswith(PREFIX) or local not in REQUIRED | {"LICENSE"}:
+    if not name.startswith(PREFIX) or local not in REQUIRED | {"LICENSE", "NOTICE.md"}:
         raise ValueError(f"Unapproved archive member: {name}")
     if len(data) > MAX_FILE:
         raise ValueError("Artifact member exceeds size limit")
@@ -74,7 +75,7 @@ def build(root: Path, output: Path):
     missing = REQUIRED - {name.removeprefix(PREFIX) for name in files}
     if missing:
         raise ValueError(f"Missing required runtime files: {sorted(missing)}")
-    for notice in ("LICENSE",):
+    for notice in ("LICENSE", "NOTICE.md"):
         path = root / notice
         if path.is_symlink():
             raise ValueError("Symlink notice")
@@ -94,7 +95,7 @@ def build(root: Path, output: Path):
     if sum(map(len, files.values())) > MAX_TOTAL:
         raise ValueError("Artifact exceeds total size limit")
     output.mkdir(parents=True, exist_ok=True)
-    archive = output / f"clash_royale_war-{version}.zip"
+    archive = output / f"clash_royale-{version}.zip"
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
         for name, data in sorted(files.items()):
             info = zipfile.ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0))

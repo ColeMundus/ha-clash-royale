@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPONENT = ROOT / "custom_components/clash_royale_war"
+COMPONENT = ROOT / "custom_components/clash_royale"
 
 
 def test_readme_installation_and_minimal_setup():
@@ -17,9 +17,21 @@ def test_readme_installation_and_minimal_setup():
     assert "https://github.com/ColeMundus/ha-clash-royale" in readme
     assert "Home Assistant Core 2026.11.0" in readme
     version = json.loads((COMPONENT / "manifest.json").read_text())["version"]
-    assert f"/v{version}/clash_royale_war-{version}.zip" in readme
-    assert "Custom repositories" in readme
-    assert "has not been submitted" in readme
+    assert f"/v{version}/clash_royale-{version}.zip" in readme
+    install = readme.split("## Installation", 1)[1].split("## ", 1)[0]
+    assert "Search for **Clash Royale**" in install
+    assert "not listed yet" in install
+    assert "custom repository" in install
+    assert "category **Integration**" in install
+    for stale in (
+        "has not been submitted",
+        "custom HACS repository",
+        "Custom repositories",
+        "pending inclusion",
+        "default catalog",
+        "while default-catalog",
+    ):
+        assert stale not in readme
     assert "https://developer.clashroyale.com/" in readme
     assert "**API token**" in readme and "**Player tag**" in readme
     assert "Allowed IP addresses" in readme and "IP-bound" in readme
@@ -30,9 +42,12 @@ def test_readme_installation_and_minimal_setup():
     assert "player's reported medals" in readme
     assert "Colosseum score" in readme
     assert "No race rank is exposed" in readme
-    assert "artwork belongs" not in readme
-    assert "official artwork" not in readme.casefold()
-    assert "not endorsed" not in readme.casefold()
+    assert "unofficial" in readme.casefold()
+    assert "not affiliated" in readme.casefold()
+    assert "not endorsed" in readme.casefold()
+    assert "artwork belongs" in readme
+    assert "https://supercell.com/en/fan-content-policy/" in readme
+    assert "[NOTICE.md](NOTICE.md)" in readme
     for stale in ("Clash of Clans", "clash_of_clans", "ha-clash-of-clans"):
         assert stale not in readme
 
@@ -74,20 +89,31 @@ def test_sensor_table_matches_implemented_sensor_names():
     assert documented == {name.casefold() for name in names}
 
 
-def test_brand_asset_and_removed_notices():
+def test_brand_asset_and_attribution():
     readme = (ROOT / "README.md").read_text()
     assert (
         '<img src="https://raw.githubusercontent.com/ColeMundus/ha-clash-royale/'
-        'main/custom_components/clash_royale_war/brand/icon.png"' in readme
+        'main/custom_components/clash_royale/brand/icon.png"' in readme
     )
-    assert 'alt="Clash Royale War Tracker"' in readme
+    assert 'alt="Clash Royale"' in readme
     with Image.open(COMPONENT / "brand/icon.png") as image:
         assert image.format == "PNG"
         assert image.size == (512, 512)
         assert not image.info
         image.verify()
-    assert not (ROOT / "NOTICE.md").exists()
-    assert not (COMPONENT / "NOTICE.md").exists()
+    notice = (ROOT / "NOTICE.md").read_text()
+    assert notice == (COMPONENT / "NOTICE.md").read_text()
+    for attribution in (
+        "Supercell Oy",
+        "https://supercell.com/en/games/clashroyale/",
+        "https://apps.apple.com/us/app/clash-royale/id1053012308",
+        "https://itunes.apple.com/lookup?id=1053012308",
+        "https://supercell.com/en/fan-content-policy/",
+        "not the repository's MIT license",
+        "This material is unofficial and is not endorsed by Supercell",
+    ):
+        assert attribution in notice
+    assert "is1-ssl.mzstatic.com" in notice
 
 
 def test_native_setup_screenshots_are_optional_and_metadata_free():

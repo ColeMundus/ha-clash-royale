@@ -139,6 +139,4 @@ class ClashRoyaleCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             except RateLimited:
                 raise UpdateFailed("Provider cooldown active") from None
             except ClashRoyaleError, ValueError:
-                raise UpdateFailed(
-                    "Unable to update Clash Royale War Tracker"
-                ) from None
+                raise UpdateFailed("Unable to update Clash Royale") from None
