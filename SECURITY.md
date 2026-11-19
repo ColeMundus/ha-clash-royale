@@ -2,7 +2,7 @@
 
 Do not post API keys, developer account details, config-entry storage, or full
 Home Assistant diagnostics in public issues. The diagnostics download redacts
-the API token. Player tags stay visible because they are public API identifiers.
+the API token as well as player, clan, and River Race participant identifiers.
 Revoke an exposed key in the [Clash Royale developer portal](https://developer.clashroyale.com)
 and replace it in Home Assistant.
 
