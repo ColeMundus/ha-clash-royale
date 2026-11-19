@@ -1,14 +1,11 @@
-# Security
+# Security Policy
 
-Do not post API keys, developer account details, config-entry storage, or full
-Home Assistant diagnostics in public issues. The diagnostics download redacts
-the API token as well as player, clan, and River Race participant identifiers.
-Revoke an exposed key in the [Clash Royale developer portal](https://developer.clashroyale.com)
-and replace it in Home Assistant.
+## Supported Versions
 
-Report vulnerabilities privately through GitHub's **Security → Report a
-vulnerability** feature when available, or contact the repository owner privately.
-Do not use public issues for secret-bearing reports.
+Only the latest release is supported with security updates.
 
-Only the latest release is maintained. The integration makes read-only requests
-to Supercell's official API; no gameplay commands or account login are supported.
+## Reporting a Vulnerability
+
+Please report security vulnerabilities privately through GitHub's **Security → Report a vulnerability** feature, or contact the repository owner privately. Do not open public issues for security vulnerabilities or reports containing secrets.
+
+If an API key is exposed, revoke it in the [Clash Royale developer portal](https://developer.clashroyale.com) and replace it in Home Assistant.
