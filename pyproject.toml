@@ -28,7 +28,7 @@ addopts = "-p pytest_homeassistant -q --strict-markers"
 target-version = "py314"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "ASYNC", "PLW"]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "PLW", "BLE"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E501"]
