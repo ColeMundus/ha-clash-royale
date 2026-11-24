@@ -1,0 +1,20 @@
+amends "package://github.com/jdx/hk/releases/download/v2.13.0/hk@2.13.0#/Config.pkl"
+
+hooks {
+  ["pre-commit"] {
+    steps {
+      ["lint"] = new Step {
+        check = "uv run --locked ruff check . && uv run --locked ruff format --check ."
+        glob = List("**/*.py", "pyproject.toml", "uv.lock")
+      }
+    }
+  }
+  ["pre-push"] {
+    steps {
+      ["validate-python"] = new Step {
+        check = "uv run --locked ruff check . && uv run --locked ruff format --check . && uv run --locked pytest"
+        glob = List("**/*")
+      }
+    }
+  }
+}
