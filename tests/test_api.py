@@ -254,9 +254,11 @@ async def test_transport_privacy(hass, provider, monkeypatch, caplog):
 
 
 def test_external_sockets_are_blocked():
-    with socket.socket() as connection:
-        with pytest.raises(pytest_socket.SocketConnectBlockedError):
-            connection.connect(("192.0.2.1", 443))
+    with (
+        socket.socket() as connection,
+        pytest.raises(pytest_socket.SocketConnectBlockedError),
+    ):
+        connection.connect(("192.0.2.1", 443))
 
 
 @pytest.mark.parametrize("endpoint", ["clan", "race"])
