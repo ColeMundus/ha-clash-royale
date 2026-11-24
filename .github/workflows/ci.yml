@@ -4,6 +4,7 @@ on:
     branches: [main]
     tags: ['**']
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
   schedule:
     - cron: '41 9 * * 1'
@@ -13,7 +14,63 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  scope:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      docs_only: ${{ steps.diff.outputs.docs_only }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Identify Markdown-only changes
+        id: diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          python3 - <<'PYTHON'
+          import os
+          import subprocess
+
+          known = {b"README.md", b"CONTRIBUTING.md", b"SECURITY.md", b"CHANGELOG.md"}
+          diff = subprocess.run(
+              ["git", "diff", "--name-only", "-z", "--no-renames", os.environ["BASE_SHA"], "HEAD", "--"],
+              stdout=subprocess.PIPE,
+              check=False,
+          )
+          paths = diff.stdout.split(b"\0")[:-1]
+          docs_only = diff.returncode == 0 and bool(paths) and all(
+              path in known or (path.startswith(b"docs/") and path.endswith(b".md"))
+              for path in paths
+          )
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"docs_only={str(docs_only).lower()}", file=output)
+          print("Markdown-only draft" if docs_only else "Full validation required")
+          PYTHON
+
+  draft-lint:
+    if: needs.scope.outputs.docs_only == 'true'
+    needs: scope
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: '3.14.7'
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+          cache-suffix: draft-lint
+      - run: uv sync --locked
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check .
   test:
+    if: ${{ !cancelled() && needs.scope.outputs.docs_only != 'true' }}
+    needs: scope
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -38,6 +95,8 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   hassfest:
+    if: ${{ !cancelled() && needs.scope.outputs.docs_only != 'true' }}
+    needs: scope
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -49,7 +108,8 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE:/github/workspace"
           ghcr.io/home-assistant/hassfest@sha256:f9ac52cfe0f7b8770334f191e6713aa9f10f0906a989bd38d75a4933534144c7
   hacs:
-    if: github.event.repository.private == false
+    needs: scope
+    if: ${{ !cancelled() && (github.event.repository.private == false) && needs.scope.outputs.docs_only != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -60,8 +120,9 @@ jobs:
         with:
           category: integration
   checks:
-    if: always()
-    needs: [test, hassfest, hacs]
+    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft && 'Draft validation' || 'checks' }}
+    if: ${{ always() && needs.scope.outputs.docs_only != 'true' }}
+    needs: [scope, test, hassfest, hacs]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
