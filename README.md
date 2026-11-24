@@ -48,3 +48,5 @@ Player race fame is the player's reported medals; clan River Race fame is clan p
 - The API does not expose chest queues, upgrade timers or resource balances. Decks used today is a reported count, not a remaining-attacks estimate or a reset countdown.
 
 This unofficial integration is not affiliated with Supercell and is not endorsed by Supercell. Clash Royale artwork belongs to Supercell; see [NOTICE.md](NOTICE.md). See Supercell's [Fan Content Policy](https://supercell.com/en/fan-content-policy/).
+
+<!-- Temporary CI measurement full-07. This PR will be closed unmerged. -->
