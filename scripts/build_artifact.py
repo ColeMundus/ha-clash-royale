@@ -9,7 +9,7 @@ from pathlib import Path, PurePosixPath
 
 from PIL import Image
 
-DOMAIN = "clash_royale"
+DOMAIN = "clash_royale_stats"
 PREFIX = f"custom_components/{DOMAIN}/"
 REQUIRED = {
     "__init__.py",
@@ -22,6 +22,7 @@ REQUIRED = {
     "strings.json",
     "translations/en.json",
     "brand/icon.png",
+    "brand/icon@2x.png",
     "diagnostics.py",
 }
 MAX_FILE = 2 * 1024 * 1024
@@ -51,8 +52,13 @@ def validate_member(name, data):
         json.loads(data)
     if local == "brand/icon.png":
         with Image.open(io.BytesIO(data)) as image:
-            if image.format != "PNG" or image.size not in {(256, 256), (512, 512)}:
-                raise ValueError("Expected square 256px or 512px PNG brand icon")
+            if image.format != "PNG" or image.size != (256, 256):
+                raise ValueError("Expected square 256px PNG brand icon")
+            image.verify()
+    if local == "brand/icon@2x.png":
+        with Image.open(io.BytesIO(data)) as image:
+            if image.format != "PNG" or image.size != (512, 512):
+                raise ValueError("Expected square 512px PNG brand icon")
             image.verify()
 
 
@@ -95,7 +101,7 @@ def build(root: Path, output: Path):
     if sum(map(len, files.values())) > MAX_TOTAL:
         raise ValueError("Artifact exceeds total size limit")
     output.mkdir(parents=True, exist_ok=True)
-    archive = output / f"clash_royale-{version}.zip"
+    archive = output / f"{DOMAIN}-{version}.zip"
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
         for name, data in sorted(files.items()):
             info = zipfile.ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0))

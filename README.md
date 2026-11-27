@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/ColeMundus/ha-clash-royale/main/custom_components/clash_royale/brand/icon.png" alt="Clash Royale" width="96">
+<img src="https://raw.githubusercontent.com/ColeMundus/ha-clash-royale/main/custom_components/clash_royale_stats/brand/icon.png" alt="Clash Royale" width="96">
 
 # Clash Royale for Home Assistant
 
@@ -18,7 +18,7 @@ Requires **Home Assistant Core 2026.11.0 or newer**.
 3. Choose **Install**, and restart Home Assistant when prompted. No pre-release setting is needed.
 4. Open **Settings → Devices & services → Add integration → Clash Royale**.
 
-**Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.3/clash_royale-0.1.3.zip), extract it into your Home Assistant configuration directory, and restart.
+**Manual install:** Download the [release ZIP](https://github.com/ColeMundus/ha-clash-royale/releases/download/v0.1.4/clash_royale_stats-0.1.4.zip), extract it into your Home Assistant configuration directory, and restart.
 
 ## Create an API key
 

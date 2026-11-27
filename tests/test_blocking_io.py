@@ -11,15 +11,15 @@ from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResultType
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPONENT = ROOT / "custom_components/clash_royale"
-DOMAIN = "clash_royale"
+COMPONENT = ROOT / "custom_components/clash_royale_stats"
+DOMAIN = "clash_royale_stats"
 INPUT = {"api_key": "synthetic-key", "player_tag": "#P0Y"}
 
 
 def _integration_caller() -> str | None:
     frame = sys._getframe(2)
     filename = frame.f_code.co_filename.replace("\\", "/")
-    if "/custom_components/clash_royale/" in filename:
+    if "/custom_components/clash_royale_stats/" in filename:
         return f"{filename}:{frame.f_lineno} {frame.f_code.co_name}"
     return None
 

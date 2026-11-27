@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPONENT = ROOT / "custom_components/clash_royale"
+COMPONENT = ROOT / "custom_components/clash_royale_stats"
 
 
 def test_readme_installation_and_minimal_setup():
@@ -17,7 +17,7 @@ def test_readme_installation_and_minimal_setup():
     assert "https://github.com/ColeMundus/ha-clash-royale" in readme
     assert "Home Assistant Core 2026.11.0" in readme
     version = json.loads((COMPONENT / "manifest.json").read_text())["version"]
-    assert f"/v{version}/clash_royale-{version}.zip" in readme
+    assert f"/v{version}/clash_royale_stats-{version}.zip" in readme
     install = readme.split("## Installation", 1)[1].split("## ", 1)[0]
     assert "Search for **Clash Royale**" in install
     assert "not listed yet" in install
@@ -93,14 +93,18 @@ def test_brand_asset_and_attribution():
     readme = (ROOT / "README.md").read_text()
     assert (
         '<img src="https://raw.githubusercontent.com/ColeMundus/ha-clash-royale/'
-        'main/custom_components/clash_royale/brand/icon.png"' in readme
+        'main/custom_components/clash_royale_stats/brand/icon.png"' in readme
     )
     assert 'alt="Clash Royale"' in readme
-    with Image.open(COMPONENT / "brand/icon.png") as image:
-        assert image.format == "PNG"
-        assert image.size == (512, 512)
-        assert not image.info
-        image.verify()
+    for icon_path, expected_size in (
+        ("brand/icon.png", (256, 256)),
+        ("brand/icon@2x.png", (512, 512)),
+    ):
+        with Image.open(COMPONENT / icon_path) as image:
+            assert image.format == "PNG"
+            assert image.size == expected_size
+            assert not image.info
+            image.verify()
     notice = (ROOT / "NOTICE.md").read_text()
     assert notice == (COMPONENT / "NOTICE.md").read_text()
     for attribution in (

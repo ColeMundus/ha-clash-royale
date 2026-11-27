@@ -9,13 +9,13 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 from pytest_homeassistant.common import MockConfigEntry
 
-from custom_components.clash_royale.api import ClashRoyaleClient, request_gate
-from custom_components.clash_royale.coordinator import ClashRoyaleCoordinator
+from custom_components.clash_royale_stats.api import ClashRoyaleClient, request_gate
+from custom_components.clash_royale_stats.coordinator import ClashRoyaleCoordinator
 
 
 def coordinator(hass, options=None):
     entry = MockConfigEntry(
-        domain="clash_royale",
+        domain="clash_royale_stats",
         unique_id="#P0Y",
         data={
             "api_key": "synthetic-key",
@@ -148,7 +148,7 @@ async def test_native_unload_discards_delayed_error(
     from homeassistant.helpers import entity_registry as er
 
     entry = MockConfigEntry(
-        domain="clash_royale",
+        domain="clash_royale_stats",
         unique_id="#P0Y",
         data={"api_key": "synthetic-key", "player_tag": "#P0Y"},
         options={"scan_interval": 5, "custom": "preserved"},

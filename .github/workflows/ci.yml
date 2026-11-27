@@ -100,7 +100,7 @@ jobs:
           printf "\n> %s\n" "uv run --locked ruff format --check ."
           uv run --locked ruff format --check . || status=1
           exit "$status"
-      - run: uv run --locked pytest --cov=custom_components/clash_royale --cov-report=term-missing --cov-fail-under=85
+      - run: uv run --locked pytest --cov=custom_components/clash_royale_stats --cov-report=term-missing --cov-fail-under=85
       - run: uv run --locked python scripts/build_artifact.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
