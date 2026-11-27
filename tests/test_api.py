@@ -10,7 +10,7 @@ import pytest
 import pytest_socket
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from custom_components.clash_royale.api import (
+from custom_components.clash_royale_stats.api import (
     ClashRoyaleClient,
     ClashRoyaleError,
     InvalidAuth,
@@ -21,7 +21,7 @@ from custom_components.clash_royale.api import (
     request_gate,
     retry_delay,
 )
-from custom_components.clash_royale.const import normalize_tag, validate_interval
+from custom_components.clash_royale_stats.const import normalize_tag, validate_interval
 
 
 @pytest.mark.parametrize("value", ["p0y", "#p0y", "  #P0Y  "])
@@ -176,7 +176,7 @@ async def test_retry_deadline_saturates_when_addition_overflows(
     import sys
     from types import SimpleNamespace
 
-    from custom_components.clash_royale import api
+    from custom_components.clash_royale_stats import api
 
     provider.set("/v1/players/#P0Y", 429, {}, {"Retry-After": str(sys.float_info.max)})
     monkeypatch.setattr(

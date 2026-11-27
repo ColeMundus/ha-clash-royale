@@ -9,9 +9,9 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant.common import MockConfigEntry, async_fire_time_changed
 
-from custom_components.clash_royale.sensor import SENSORS
+from custom_components.clash_royale_stats.sensor import SENSORS
 
-DOMAIN = "clash_royale"
+DOMAIN = "clash_royale_stats"
 INPUT = {"api_key": "synthetic-key", "player_tag": "#P0Y", "scan_interval": 5}
 PREFIX = "sensor.clash_royale_synthetic_player_"
 

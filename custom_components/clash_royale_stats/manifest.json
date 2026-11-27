@@ -1,5 +1,5 @@
 {
-  "domain": "clash_royale",
+  "domain": "clash_royale_stats",
   "name": "Clash Royale",
   "categories": ["media_entertainment.gaming"],
   "codeowners": [
@@ -11,5 +11,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/ColeMundus/ha-clash-royale/issues",
   "requirements": [],
-  "version": "0.1.3"
+  "version": "0.1.4"
 }

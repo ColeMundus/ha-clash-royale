@@ -5,11 +5,11 @@ import json
 from homeassistant.components.diagnostics import REDACTED
 from pytest_homeassistant.common import MockConfigEntry
 
-from custom_components.clash_royale.diagnostics import (
+from custom_components.clash_royale_stats.diagnostics import (
     async_get_config_entry_diagnostics,
 )
 
-DOMAIN = "clash_royale"
+DOMAIN = "clash_royale_stats"
 TOKEN = "synthetic-key"
 
 

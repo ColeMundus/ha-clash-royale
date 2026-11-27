@@ -2,7 +2,7 @@
 
 import re
 
-DOMAIN = "clash_royale"
+DOMAIN = "clash_royale_stats"
 CONF_PLAYER_TAG = "player_tag"
 DEFAULT_SCAN_INTERVAL = 5
 API_BASE = "https://api.clashroyale.com/v1"
